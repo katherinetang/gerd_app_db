@@ -158,17 +158,18 @@ import 'package:flutter/widgets.dart';
 // }
 
 class patient_info {
-  final String first_name;
-  final String last_name;
-  final int mhr_number;
-  final DateTime time_stamp;
+  String first_name = '';
+  String last_name = '';
+  int mhr_number = 0;
+  String time_stamp = '';
 
-  const patient_info({
-    required this.first_name,
-    required this.last_name,
-    required this.mhr_number,
-    required this.time_stamp,
-  });
+  patient_info(
+      String first_name, String last_name, int mhr_number, String time_stamp) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.mhr_number = mhr_number;
+    this.time_stamp = time_stamp;
+  }
 
   // Convert patient_info into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -187,16 +188,67 @@ class patient_info {
   String toString() {
     return 'patient_info{first_name: $first_name, last_name: $last_name, mhr_number: $mhr_number, time_stamp: $time_stamp}';
   }
+
+  Future<void> insert_patient_info(patient_info data) async {
+    // Get a reference to the database.
+
+    WidgetsFlutterBinding.ensureInitialized();
+// Open the database and store the reference.
+    final database = openDatabase(
+      // Set the path to the database. Note: Using the `join` function from the
+      // `path` package is best practice to ensure the path is correctly
+      // constructed for each platform.
+      'db/gerd_database.db',
+// When the database is first created, create a table to store dogs.
+      onCreate: (db, version) async {
+// Run the CREATE TABLE statement on the database.
+
+// return db.execute(
+        // 'CREATE TABLE ph_data(ph_value FLOAT NOT NULL, time_stamp DATETIME PRIMARY KEY)',
+// );
+        return db.execute(
+          'CREATE TABLE patient_info(first_name TEXT, last_name TEXT, mhr_number INT PRIMARY KEY, time_stamp TEXT NOT NULL)',
+        );
+      },
+// Set the version. This executes the onCreate function and provides a
+// path to perform database upgrades and downgrades.
+      version: 1,
+    );
+    final db = await database;
+
+    // Insert the pH data into the correct table. You might also specify the
+    // `conflictAlgorithm` to use in case the same timestamp is inserted twice.
+    //
+    // In this case, replace any previous data.
+    await db.insert('patient_info', data.toMap());
+  }
+
+  Future<List<patient_info>> retrieve_patient_info() async {
+    final db = await openDatabase('db/gerd_database.db');
+
+    final List<Map<String, dynamic>> maps = await db.query('patient_info');
+
+    int row = maps.length;
+    int col = 2;
+    patient_info null_patient = new patient_info('', '', 0, '');
+    var pat_time = List.filled(maps.length, null_patient, growable: false);
+    for (var i = 0; i < maps.length; i++) {
+      patient_info add_patient = new patient_info(maps[i]['first_name'],
+          maps[i]['last_name'], maps[i]['mhr_number'], maps[i]['time_stamp']);
+      pat_time[i] = add_patient;
+    }
+    return pat_time;
+  }
 }
 
 class doctor_info {
-  final String email_id;
-  final DateTime time_stamp;
+  String email_id = '';
+  String time_stamp = '';
 
-  const doctor_info({
-    required this.email_id,
-    required this.time_stamp,
-  });
+  doctor_info(String email_id, String time_stamp) {
+    this.email_id = email_id;
+    this.time_stamp = time_stamp;
+  }
 
   // Convert doctor_info into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -212,6 +264,57 @@ class doctor_info {
   @override
   String toString() {
     return 'doctor_info{email_id: $email_id, time_stamp: $time_stamp}';
+  }
+
+  Future<void> insert_doctor_info(doctor_info data) async {
+    // Get a reference to the database.
+
+    WidgetsFlutterBinding.ensureInitialized();
+// Open the database and store the reference.
+    final database = openDatabase(
+      // Set the path to the database. Note: Using the `join` function from the
+      // `path` package is best practice to ensure the path is correctly
+      // constructed for each platform.
+      'db/gerd_database.db',
+// When the database is first created, create a table to store dogs.
+      onCreate: (db, version) async {
+// Run the CREATE TABLE statement on the database.
+
+// return db.execute(
+        // 'CREATE TABLE ph_data(ph_value FLOAT NOT NULL, time_stamp DATETIME PRIMARY KEY)',
+// );
+        return db.execute(
+          'CREATE TABLE doctor_info(email_id TEXT PRIMARY KEY, time_stamp TEXT NOT NULL)',
+        );
+      },
+// Set the version. This executes the onCreate function and provides a
+// path to perform database upgrades and downgrades.
+      version: 1,
+    );
+    final db = await database;
+
+    // Insert the pH data into the correct table. You might also specify the
+    // `conflictAlgorithm` to use in case the same timestamp is inserted twice.
+    //
+    // In this case, replace any previous data.
+    await db.insert('doctor_info', data.toMap());
+  }
+
+  Future<List<doctor_info>> retrieve_doctor_info() async {
+    final db = await openDatabase('db/gerd_database.db');
+
+    final List<Map<String, dynamic>> maps = await db.query('doctor_info');
+
+    int row = maps.length;
+    int col = 2;
+    doctor_info null_doctor = new doctor_info('', '');
+    var doc_time = List.filled(maps.length, null_doctor, growable: false);
+    for (var i = 0; i < maps.length; i++) {
+      doctor_info add_doctor =
+          new doctor_info(maps[i]['email_id'], maps[i]['time_stamp']);
+      doc_time[i] = add_doctor;
+    }
+    return doc_time;
   }
 }
 
@@ -240,37 +343,36 @@ class ph_data {
 
     WidgetsFlutterBinding.ensureInitialized();
 // Open the database and store the reference.
- final database = openDatabase(
-  // Set the path to the database. Note: Using the `join` function from the
-  // `path` package is best practice to ensure the path is correctly
-  // constructed for each platform.
-    'db/gerd_database.db',
+    final database = openDatabase(
+      // Set the path to the database. Note: Using the `join` function from the
+      // `path` package is best practice to ensure the path is correctly
+      // constructed for each platform.
+      'db/gerd_database.db',
 // When the database is first created, create a table to store dogs.
-    onCreate: (db, version) async{
+      onCreate: (db, version) async {
 // Run the CREATE TABLE statement on the database.
 
 // return db.execute(
-  // 'CREATE TABLE ph_data(ph_value FLOAT NOT NULL, time_stamp DATETIME PRIMARY KEY)',
+        // 'CREATE TABLE ph_data(ph_value FLOAT NOT NULL, time_stamp DATETIME PRIMARY KEY)',
 // );
-      return db.execute(
-        'CREATE TABLE ph_data(ph_value FLOAT NOT NULL, time_stamp TEXT PRIMARY KEY)',
-      );
-},
+        return db.execute(
+          'CREATE TABLE ph_data(ph_value FLOAT NOT NULL, time_stamp TEXT PRIMARY KEY)',
+        );
+      },
 // Set the version. This executes the onCreate function and provides a
 // path to perform database upgrades and downgrades.
-version: 1,
-);
+      version: 1,
+    );
     final db = await database;
 
-      // Insert the pH data into the correct table. You might also specify the
-      // `conflictAlgorithm` to use in case the same timestamp is inserted twice.
-      //
-      // In this case, replace any previous data.
-      await db.insert('ph_data', data.toMap());
+    // Insert the pH data into the correct table. You might also specify the
+    // `conflictAlgorithm` to use in case the same timestamp is inserted twice.
+    //
+    // In this case, replace any previous data.
+    await db.insert('ph_data', data.toMap());
   }
 
   Future<List<ph_data>> retrieve_ph_data() async {
-
     final db = await openDatabase('db/gerd_database.db');
 
     final List<Map<String, dynamic>> maps = await db.query('ph_data');
@@ -279,14 +381,12 @@ version: 1,
     int col = 2;
     ph_data null_pH = new ph_data(0.0, '');
     var phtime = List.filled(maps.length, null_pH, growable: false);
-    for (var i = 0; i<maps.length; i++) {
-       ph_data add_pH = new ph_data(maps[i]['ph_value'], maps[i]['time_stamp']);
-       phtime[i] = add_pH;
+    for (var i = 0; i < maps.length; i++) {
+      ph_data add_pH = new ph_data(maps[i]['ph_value'], maps[i]['time_stamp']);
+      phtime[i] = add_pH;
     }
     return phtime;
-
   }
-
 
   // Implement toString to make it easier to see information about
   // the pH values when using the print statement.
@@ -396,13 +496,13 @@ class symptoms_status {
 }
 
 class messages {
-  final String message;
-  final DateTime time_stamp;
+  String message = '';
+  String time_stamp = '';
 
-  const messages({
-    required this.message,
-    required this.time_stamp,
-  });
+  messages(String message, String time_stamp) {
+    this.message = message;
+    this.time_stamp = time_stamp;
+  }
 
   // Convert messages into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -418,5 +518,53 @@ class messages {
   @override
   String toString() {
     return 'messages{message: $message, time_stamp: $time_stamp}';
+  }
+
+  Future<void> insert_message(messages message) async {
+    // Get a reference to the database.
+
+    WidgetsFlutterBinding.ensureInitialized();
+// Open the database and store the reference.
+    final database = openDatabase(
+      // Set the path to the database. Note: Using the `join` function from the
+      // `path` package is best practice to ensure the path is correctly
+      // constructed for each platform.
+      'db/gerd_database.db',
+// When the database is first created, create a table to store dogs.
+      onCreate: (db, version) async {
+// Run the CREATE TABLE statement on the database.
+
+        return db.execute(
+          'CREATE TABLE messages(message TEXT, time_stamp TEXT PRIMARY KEY)',
+        );
+      },
+// Set the version. This executes the onCreate function and provides a
+// path to perform database upgrades and downgrades.
+      version: 1,
+    );
+    final db = await database;
+
+    // Insert the pH data into the correct table. You might also specify the
+    // `conflictAlgorithm` to use in case the same timestamp is inserted twice.
+    //
+    // In this case, replace any previous data.
+    await db.insert('messages', message.toMap());
+  }
+
+  Future<List<messages>> retrieve_messages() async {
+    final db = await openDatabase('db/gerd_database.db');
+
+    final List<Map<String, dynamic>> maps = await db.query('messages');
+
+    int row = maps.length;
+    int col = 2;
+    messages null_message = new messages('', '');
+    var mess_time = List.filled(maps.length, null_message, growable: false);
+    for (var i = 0; i < maps.length; i++) {
+      messages add_mess =
+          new messages(maps[i]['message'], maps[i]['time_stamp']);
+      mess_time[i] = add_mess;
+    }
+    return mess_time;
   }
 }
