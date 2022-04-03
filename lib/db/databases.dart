@@ -198,7 +198,7 @@ class patient_info {
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
       // constructed for each platform.
-      'db/gerd_database.db',
+      'db/gerd_database_patient_info.db',
 // When the database is first created, create a table to store dogs.
       onCreate: (db, version) async {
 // Run the CREATE TABLE statement on the database.
@@ -224,7 +224,7 @@ class patient_info {
   }
 
   Future<List<patient_info>> retrieve_patient_info() async {
-    final db = await openDatabase('db/gerd_database.db');
+    final db = await openDatabase('db/gerd_database_patient_info.db');
 
     final List<Map<String, dynamic>> maps = await db.query('patient_info');
 
@@ -275,7 +275,7 @@ class doctor_info {
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
       // constructed for each platform.
-      'db/gerd_database.db',
+      'db/gerd_database_doctor_info.db',
 // When the database is first created, create a table to store dogs.
       onCreate: (db, version) async {
 // Run the CREATE TABLE statement on the database.
@@ -301,7 +301,7 @@ class doctor_info {
   }
 
   Future<List<doctor_info>> retrieve_doctor_info() async {
-    final db = await openDatabase('db/gerd_database.db');
+    final db = await openDatabase('db/gerd_database_doctor_info.db');
 
     final List<Map<String, dynamic>> maps = await db.query('doctor_info');
 
@@ -347,7 +347,7 @@ class ph_data {
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
       // constructed for each platform.
-      'db/gerd_database.db',
+      'db/gerd_database_ph_data.db',
 // When the database is first created, create a table to store dogs.
       onCreate: (db, version) async {
 // Run the CREATE TABLE statement on the database.
@@ -373,7 +373,7 @@ class ph_data {
   }
 
   Future<List<ph_data>> retrieve_ph_data() async {
-    final db = await openDatabase('db/gerd_database.db');
+    final db = await openDatabase('db/gerd_database_ph_data.db');
 
     final List<Map<String, dynamic>> maps = await db.query('ph_data');
 
@@ -529,7 +529,7 @@ class messages {
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
       // constructed for each platform.
-      'db/gerd_database.db',
+      'db/gerd_database_messages.db',
 // When the database is first created, create a table to store dogs.
       onCreate: (db, version) async {
 // Run the CREATE TABLE statement on the database.
@@ -552,7 +552,7 @@ class messages {
   }
 
   Future<List<messages>> retrieve_messages() async {
-    final db = await openDatabase('db/gerd_database.db');
+    final db = await openDatabase('db/gerd_database_messages.db');
 
     final List<Map<String, dynamic>> maps = await db.query('messages');
 
